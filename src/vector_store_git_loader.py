@@ -191,7 +191,15 @@ class GitDocument:
             status_callback (Callable, optional): Function to call with status updates.
         """
         self.repo_url = repo_url
-        self.local_path = local_path
+        # sanitize and normalize local_path to avoid invalid characters/trailing spaces
+        if isinstance(local_path, str):
+            lp = local_path.strip()
+            # replace trailing dots/spaces which can be invalid on Windows
+            while lp.endswith(".") or lp.endswith(" "):
+                lp = lp[:-1]
+            self.local_path = os.path.normpath(lp)
+        else:
+            self.local_path = local_path
         self.vector_store = vector_store
         self.embedding_manager = embedding_manager
         self.status_callback = status_callback
