@@ -73,14 +73,14 @@ def render_sidebar():
         
         repo_url = st.text_input(
             "Repository URL",
-            value="https://github.com/tharun067/advanced_agent_ai.git",
+            placeholder="https://github.com/user_name/repo_name.git",
             help="Enter the Git repository URL",
             key="repo_url"
         )
 
         local_path = st.text_input(
             "Local Path",
-            value="./cloned_repo",
+            placeholder="./repo_name",
             help="Local directory to clone the repository",
             key="local_path"
         )
