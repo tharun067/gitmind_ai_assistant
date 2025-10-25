@@ -1,4 +1,6 @@
 import streamlit as st
+import os
+import shutil
 from src.vector_store_git_loader import (
     EmbeddingManager,
     VectorStoreManager,
@@ -9,6 +11,35 @@ from src.vector_store_git_loader import (
 )
 
 from src.llm import agent_build
+
+
+def clear_database():
+    """Remove the ChromaDB directory to start fresh."""
+    try:
+        messages = []
+        success = True
+        
+        # Clear ChromaDB
+        if os.path.exists(CHROMADB_DIR):
+            shutil.rmtree(CHROMADB_DIR)
+            messages.append("Database cleared successfully!")
+        else:
+            messages.append("No database found to clear.")
+        
+        # Clear cloned repository if it exists
+        if 'local_path' in st.session_state and st.session_state.local_path:
+            local_path = st.session_state.local_path
+            if os.path.exists(local_path):
+                try:
+                    shutil.rmtree(local_path)
+                    messages.append(f"Cloned repository at '{local_path}' removed!")
+                except Exception as e:
+                    messages.append(f"Warning: Could not remove repository at '{local_path}': {e}")
+                    success = True  # Don't fail the whole operation
+        
+        return success, " | ".join(messages)
+    except Exception as e:
+        return False, f"Error during cleanup: {e}"
 
 
 def update_status_callback(message, status_container=None):
@@ -133,8 +164,19 @@ def render_sidebar():
         
         with col2:
             if st.button("🔄 Reset All", use_container_width=True):
+                # Clear the database
+                success, message = clear_database()
+                
+                if success:
+                    st.info(f"🗑️ {message}")
+                else:
+                    st.warning(f"⚠️ {message}")
+                
+                # Clear all session state
                 for key in list(st.session_state.keys()):
                     del st.session_state[key]
+                
+                st.success("✅ All data reset! Please reprocess your repository.")
                 st.rerun()
         
         return repo_url, local_path

@@ -124,7 +124,22 @@ class VectorStoreManager:
             raise ValueError("The number of documents must match the number of embeddings.")
         
         ids = [str(uuid.uuid4()) for _ in range(len(documents))]
-        metadatas = [{"source": doc.metadata.get("source", "unknown")} for doc in documents]
+        # Preserve ALL metadata from the original documents, not just "source"
+        metadatas = []
+        for doc in documents:
+            # Copy all metadata, but ensure all values are strings, numbers, or booleans
+            # ChromaDB doesn't accept complex types in metadata
+            metadata = {}
+            for key, value in doc.metadata.items():
+                if isinstance(value, (str, int, float, bool)):
+                    metadata[key] = value
+                else:
+                    metadata[key] = str(value)
+            # Ensure there's always a source field for compatibility
+            if "source" not in metadata:
+                metadata["source"] = "unknown"
+            metadatas.append(metadata)
+        
         texts = [doc.page_content for doc in documents]
 
         self._update_status(f"Adding {len(documents)} documents to the vector store.")
@@ -282,27 +297,26 @@ class GitDocument:
         self.vector_store.add_documents(texts, embeddings)
         self._update_status("All documents processed and stored successfully.")
 
-"""
+
 #### Example usage for testing purposes
 def main():
     logging.basicConfig(level=logging.INFO)
-    
-    pipepline = GitDocument(
-        repo_url="https://github.com/tharun067/advanced_agent_ai.git",
+
+    pipeline = GitDocument(
+        repo_url="https://github.com/tharun067/THARUN-PORTFOLIO.git",
         local_path="./cloned_repo",
         vector_store=VectorStoreManager(),
         embedding_manager=EmbeddingManager(),
     )
-    #pipepline.process_and_store_documents()
+    #pipeline.process_and_store_documents()
     logging.info("Process completed.")
 
     ### Example of using the retriever
-    retriever = pipepline.vector_store.as_retriever()
-    query = "what firecrawl does?"
+    retriever = pipeline.vector_store.as_retriever(k=6)
+    query = "what constants folder contains?"
     docs = retriever.get_relevant_documents(query)
     for i, d in enumerate(docs, 1):
         print(f"Result {i}: source={d.metadata.get('source')}, snippet={d.page_content[:200]!r}")
 if __name__ == "__main__":
     main()
 
-"""
