@@ -270,8 +270,13 @@ class GitDocument:
         """
         try:
             self._update_status(f"Loading documents from repository at {self.local_path}")
-            loader = GitLoader(repo_path=self.local_path, branch="main")
-            documents = loader.load()
+            try:
+                loader = GitLoader(repo_path=self.local_path, branch="main")
+                documents = loader.load()
+            except Exception as e:
+                self._update_status(f"Branching 'main' failed: {e}. Trying 'master' branch.")
+                loader = GitLoader(repo_path=self.local_path, branch="master")
+                documents = loader.load()
             self._update_status(f"{len(documents)} documents loaded successfully.")
             return documents
         except Exception as e:
