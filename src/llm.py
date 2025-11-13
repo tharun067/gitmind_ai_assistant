@@ -169,10 +169,10 @@ def agent_build(api_key: str = None):
 
     return graph
 
-"""
+agent = agent_build()
 def main():
     # Main function with conversation memory
-    graph = agent_build()
+    graph = agent
     conversation_messages = []
     
     print("=" * 60)
@@ -231,5 +231,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-"""

@@ -16,6 +16,11 @@ your_project/
 └── cloned_repo/                # Cloned repositories (created automatically)
 ```
 
+
+## Architecture
+
+![Graph Architecture](graph.png)
+
 ## 🚀 Installation
 
 1. **Install dependencies:**

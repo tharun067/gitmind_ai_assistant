@@ -8,7 +8,6 @@ import logging
 from langchain_community.document_loaders.git import GitLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
-
 from sentence_transformers import SentenceTransformer
 import chromadb
 
@@ -308,20 +307,20 @@ def main():
     logging.basicConfig(level=logging.INFO)
 
     pipeline = GitDocument(
-        repo_url="https://github.com/tharun067/THARUN-PORTFOLIO.git",
+        repo_url="https://github.com/stamparm/maltrail.git",
         local_path="./cloned_repo",
         vector_store=VectorStoreManager(),
         embedding_manager=EmbeddingManager(),
     )
-    #pipeline.process_and_store_documents()
+    pipeline.process_and_store_documents()
     logging.info("Process completed.")
 
     ### Example of using the retriever
-    retriever = pipeline.vector_store.as_retriever(k=6)
-    query = "what constants folder contains?"
-    docs = retriever.get_relevant_documents(query)
-    for i, d in enumerate(docs, 1):
-        print(f"Result {i}: source={d.metadata.get('source')}, snippet={d.page_content[:200]!r}")
+    #retriever = pipeline.vector_store.as_retriever(k=6)
+    #query = "what constants folder contains?"
+    #docs = retriever.get_relevant_documents(query)
+    #for i, d in enumerate(docs, 1):
+    #    print(f"Result {i}: source={d.metadata.get('source')}, snippet={d.page_content[:200]!r}")
 if __name__ == "__main__":
     main()
 

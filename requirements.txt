@@ -9,3 +9,5 @@ gitpython
 streamlit
 langchain-groq
 langchain-google-genai
+langgraph-cli[inmem]
+grpcio>=1.76.0
